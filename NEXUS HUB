@@ -1,0 +1,91 @@
+-- Nexus Hub Universal Script
+-- Criado por Joao
+
+local NexusHub = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local FlyButton = Instance.new("TextButton")
+local NoclipButton = Instance.new("TextButton")
+local SpinButton = Instance.new("TextButton")
+
+NexusHub.Name = "NexusHub"
+NexusHub.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = NexusHub
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
+MainFrame.Size = UDim2.new(0, 300, 0, 200)
+
+local function createButton(name, position, callback)
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Parent = MainFrame
+    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    button.Position = position
+    button.Size = UDim2.new(0, 280, 0, 40)
+    button.Font = Enum.Font.SourceSans
+    button.Text = name
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextSize = 20
+    button.MouseButton1Click:Connect(callback)
+    return button
+end
+
+-- Fly Function
+local flying = false
+function toggleFly()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    flying = not flying
+    if flying then
+        local bodyVelocity = Instance.new("BodyVelocity", humanoidRootPart)
+        bodyVelocity.Name = "FlyVelocity"
+        bodyVelocity.Velocity = Vector3.new(0, 50, 0)
+        bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+    else
+        humanoidRootPart:FindFirstChild("FlyVelocity"):Destroy()
+    end
+end
+
+-- Noclip Function
+local noclip = false
+function toggleNoclip()
+    noclip = not noclip
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    game:GetService("RunService").Stepped:Connect(function()
+        if noclip then
+            for _, part in pairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end)
+end
+
+-- Spin Function
+local spinning = false
+function toggleSpin()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local root = character:WaitForChild("HumanoidRootPart")
+
+    spinning = not spinning
+    if spinning then
+        local spin = Instance.new("BodyAngularVelocity", root)
+        spin.Name = "SpinVelocity"
+        spin.AngularVelocity = Vector3.new(0, 10, 0)
+        spin.MaxTorque = Vector3.new(0, math.huge, 0)
+    else
+        root:FindFirstChild("SpinVelocity"):Destroy()
+    end
+end
+
+-- Botões
+createButton("Fly", UDim2.new(0, 10, 0, 10), toggleFly)
+createButton("Noclip", UDim2.new(0, 10, 0, 60), toggleNoclip)
+createButton("Spin", UDim2.new(0, 10, 0, 110), toggleSpin)
